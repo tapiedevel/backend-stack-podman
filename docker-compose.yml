@@ -1,0 +1,34 @@
+services:
+  web:
+    build: .
+    container_name: servidor-web-apache
+    ports:
+      - "8080:80" # En Fedora, el puerto 80 suele estar reservado; usamos 8080
+    volumes:
+      - ./www:/var/www/html:Z  # :Z reetiqueta para SELinux
+    networks:
+      - red-local
+
+  db:
+    image: docker.io/mysql:8.0
+    container_name: servidor-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: gtilogic
+    volumes:
+      - ./db_data:/var/lib/mysql:Z # :Z es vital aquí para MySQL
+    networks:
+      - red-local
+
+  phpmyadmin:
+    image: docker.io/phpmyadmin:latest
+    container_name: servidor-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+    networks:
+      - red-local
+
+networks:
+  red-local:
+    driver: bridge
